@@ -9,15 +9,11 @@ public class CustomLinkedList<E> implements Iterable<Node<E>> {
     private Node<E> first;
     private Node<E> last;
     private int length;
+    private Comparator<E> comparator;
 
-    public CustomLinkedList() {
+    public CustomLinkedList(Comparator<E> comparator) {
+        this.comparator = comparator;
         length = 0;
-    }
-
-    public CustomLinkedList(Node<E> head, Node<E> last) {
-        this.first = Objects.requireNonNull(head);
-        this.last = Objects.requireNonNull(last);
-        length = 2;
     }
 
     public Node<E> getFirst() {
@@ -40,70 +36,44 @@ public class CustomLinkedList<E> implements Iterable<Node<E>> {
         return length;
     }
 
-    private void insertAtEnd(E data) {
+    public Comparator<E> getComparator(){ return comparator;}
+
+    public void setComparator(Comparator<E> comparator){
+        this.comparator = comparator;
+
+        CustomLinkedList<E> auxList = new CustomLinkedList<>(comparator);
+        for (Node<E> node: this) {
+            auxList.addElement(node.getData());
+            this.deleteNode(node);
+        }
+
+        for(Node<E> node: auxList){
+            this.addElement(node.getData());
+        }
+    }
+
+    private void push(E data) {
         Node<E> node = new Node<>(data);
         if (this.isEmpty()) {
-            insertIfEmpty(node);
+            this.setFirst(node);
         } else {
             this.getLast().setNext(node);
             node.setPrev(this.getLast());
-            node.setNext(null);
-            this.setLast(node);
-            length++;
         }
-
+        this.setLast(node);
+        length++;
     }
 
-    private void insertAt(E data, int index) {
-        if (length == 0 || itShouldBeLast(index)) {
-            insertAtEnd(data);
-            return;
-        }
-
-        Node<E> currentIndexNode = getNodeByIndex(index);
-        insertNodeAsPrev(new Node<>(data), currentIndexNode);
-    }
-
-    public void addElement(Comparable<E> data) {
-        for (Node<E> current : this) {
-            if (data.compareTo(current.getData()) < 0) {
-                insertNodeAsPrev((Node<E>) new Node<>(data), current);
-                return;
-            }
-        }
-        insertAtEnd((E) data);
-    }
     // 4
     // 1, 3, 5, 7,
-    public void addElement(E data, Comparator<E> comparator) {
+    public void addElement(E data) {
         for (Node<E> current : this) {
             if (comparator.compare(current.getData(), data) >= 0) {
                 insertNodeAsPrev(new Node<>(data), current);
                 return;
             }
         }
-        insertAtEnd(data);
-    }
-
-    public void addElementAt(E data, int index) {
-        Node<E> node = new Node<>(data);
-        Node<E> tempNode = this.first;
-        int i = 0;
-        if (index <= length) {
-            while (positionNotFound(index, i)) {
-                tempNode = tempNode.getNext();
-                i++;
-            }
-            if (itShouldBeLast(i)) {
-                this.insertAtEnd(data);
-            } else if (i == 0) {
-                insertAtFirst(data);
-            } else {
-                insertNodeAsPrev(node, tempNode);
-            }
-        } else {
-            throw new IndexOutOfBoundsException();
-        }
+        push(data);
     }
 
     private void insertNodeAsPrev(Node<E> nodeToInsert, Node<E> contextNode) {
@@ -131,23 +101,6 @@ public class CustomLinkedList<E> implements Iterable<Node<E>> {
         return i < length && i != index;
     }
 
-    public void insertAtFirst(E data) {
-        Node<E> node = new Node<>(data);
-        if (isEmpty()) {
-            insertIfEmpty(node);
-        } else {
-            node.setPrev(null);
-            node.setNext(this.getFirst());
-            this.getFirst().setPrev(node);
-            if (this.getFirst().getNext() == null) {
-                this.getFirst().setNext(null);
-                this.setLast(this.getFirst());
-            }
-            this.setFirst(node);
-            this.length++;
-        }
-    }
-
     public void deleteAt(int index) {
         if (index > this.length || index < 0) {
             throw new IndexOutOfBoundsException(index);
@@ -156,13 +109,7 @@ public class CustomLinkedList<E> implements Iterable<Node<E>> {
         deleteNode(getNodeByIndex(index));
     }
 
-    private void insertIfEmpty(Node<E> node) {
-        this.first = node;
-        this.last = node;
-        node.setPrev(null);
-        node.setNext(null);
-        this.length++;
-    }
+
 
     public boolean isEmpty() {
         return this.length == 0;
@@ -236,8 +183,10 @@ public class CustomLinkedList<E> implements Iterable<Node<E>> {
         // [A, targetNode, C]
         Node prev = targetNode.getPrev(); // A
         Node next = targetNode.getNext(); // C
-        prev.setNext(next); // A -> C
-        next.setPrev(prev); // A <- C
+        if(prev != null)
+            prev.setNext(next); // A -> C
+        if (next != null)
+            next.setPrev(prev); // A <- C
         length--;
     }
 
