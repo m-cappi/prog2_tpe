@@ -101,16 +101,6 @@ public class CustomLinkedList<E> implements Iterable<Node<E>> {
         return i < length && i != index;
     }
 
-    public void deleteAt(int index) {
-        if (index > this.length || index < 0) {
-            throw new IndexOutOfBoundsException(index);
-        }
-
-        deleteNode(getNodeByIndex(index));
-    }
-
-
-
     public boolean isEmpty() {
         return this.length == 0;
     }
@@ -155,26 +145,36 @@ public class CustomLinkedList<E> implements Iterable<Node<E>> {
                 '}';
     }
 
-    public void deleteByData(E targetData) {
+    public void deleteBy(int index) {
+        if (index > this.length || index < 0) {
+            throw new IndexOutOfBoundsException(index);
+        }
+
+        deleteNode(getNodeByIndex(index));
+    }
+
+    public void deleteBy(E targetData) {
         int pos = 0;
         Node aux = first;
         while (pos < length) {
             if (aux.getData().equals(targetData)) {
                 deleteNode(aux);
+            } else{
+                pos++;
             }
-            pos++;
             aux = aux.getNext();
         }
     }
 
-    public void deleteByNode(Node<E> targetNode) {
+    public void deleteBy(Node<E> targetNode) {
         int pos = 0;
         Node aux = first;
         while (pos < length) {
             if (aux.equals(targetNode)) {
                 deleteNode(aux);
+            } else{
+                pos++;
             }
-            pos++;
             aux = aux.getNext();
         }
     }
@@ -195,12 +195,12 @@ public class CustomLinkedList<E> implements Iterable<Node<E>> {
         Node aux = first;
         while (pos < length) {
             if (aux.equals(targetNode)) {
-                break;
+                return pos;
             }
             pos++;
             aux = aux.getNext();
         }
-        return pos;
+        return -1;
     }
 
     @Override
