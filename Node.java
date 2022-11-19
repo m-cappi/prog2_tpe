@@ -1,12 +1,6 @@
 package TPE_LinkedList;
-
-import java.util.Objects;
-
 public class Node<E> {
     private Node<E> next;
-
-
-
     private Node<E> prev;
     private E data;
 
@@ -44,5 +38,10 @@ public class Node<E> {
         }else{
             deleteAt(index -1);
         }
+    }
+
+    @Override
+    public String toString() {
+        return getData().toString();
     }
 }

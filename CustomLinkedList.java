@@ -36,18 +36,20 @@ public class CustomLinkedList<E> implements Iterable<Node<E>> {
         return length;
     }
 
-    public Comparator<E> getComparator(){ return comparator;}
+    public Comparator<E> getComparator() {
+        return comparator;
+    }
 
-    public void setComparator(Comparator<E> comparator){
+    public void setComparator(Comparator<E> comparator) {
         this.comparator = comparator;
 
         CustomLinkedList<E> auxList = new CustomLinkedList<>(comparator);
-        for (Node<E> node: this) {
+        for (Node<E> node : this) {
             auxList.addElement(node.getData());
             this.deleteNode(node);
         }
 
-        for(Node<E> node: auxList){
+        for (Node<E> node : auxList) {
             this.addElement(node.getData());
         }
     }
@@ -111,7 +113,7 @@ public class CustomLinkedList<E> implements Iterable<Node<E>> {
         }
     }
 
-    public Node getNodeByIndex(int index) {
+    public Node getNodeBy(int index) {
         validateIndex(index);
         int pos = 0;
         for (Node<E> current : this) {
@@ -121,19 +123,6 @@ public class CustomLinkedList<E> implements Iterable<Node<E>> {
             pos++;
         }
         return null;
-        /*
-        if (index == length) {
-            // shortcut to last
-            return last;
-        }
-        Node aux = first;
-        int count = 0;
-        while (index != count) {
-            count++;
-            aux = aux.getNext();
-        }
-        return aux;
-        */
     }
 
     @Override
@@ -146,11 +135,9 @@ public class CustomLinkedList<E> implements Iterable<Node<E>> {
     }
 
     public void deleteBy(int index) {
-        if (index > this.length || index < 0) {
-            throw new IndexOutOfBoundsException(index);
-        }
+        validateIndex(index);
 
-        deleteNode(getNodeByIndex(index));
+        deleteNode(getNodeBy(index));
     }
 
     public void deleteBy(E targetData) {
@@ -159,7 +146,7 @@ public class CustomLinkedList<E> implements Iterable<Node<E>> {
         while (pos < length) {
             if (aux.getData().equals(targetData)) {
                 deleteNode(aux);
-            } else{
+            } else {
                 pos++;
             }
             aux = aux.getNext();
@@ -172,7 +159,7 @@ public class CustomLinkedList<E> implements Iterable<Node<E>> {
         while (pos < length) {
             if (aux.equals(targetNode)) {
                 deleteNode(aux);
-            } else{
+            } else {
                 pos++;
             }
             aux = aux.getNext();
@@ -183,18 +170,35 @@ public class CustomLinkedList<E> implements Iterable<Node<E>> {
         // [A, targetNode, C]
         Node prev = targetNode.getPrev(); // A
         Node next = targetNode.getNext(); // C
-        if(prev != null)
+        if (prev != null)
             prev.setNext(next); // A -> C
         if (next != null)
             next.setPrev(prev); // A <- C
+        if(targetNode.equals(getFirst()))
+            setFirst(next);
+        if (targetNode.equals(getLast()))
+            setLast(prev);
         length--;
     }
 
-    public int getIndexByNode(Node<E> targetNode) {
+    public int getIndexBy(Node<E> targetNode) {
         int pos = 0;
         Node aux = first;
         while (pos < length) {
             if (aux.equals(targetNode)) {
+                return pos;
+            }
+            pos++;
+            aux = aux.getNext();
+        }
+        return -1;
+    }
+
+    public int getIndexBy(E targetData) {
+        int pos = 0;
+        Node aux = first;
+        while (pos < length) {
+            if (aux.getData().equals(targetData)) {
                 return pos;
             }
             pos++;
@@ -217,16 +221,14 @@ public class CustomLinkedList<E> implements Iterable<Node<E>> {
 
         @Override
         public boolean hasNext() {
-            if (current == null) {
-                return false;
-            }
-            return Objects.nonNull(current.getNext());
+            return Objects.nonNull(current);
         }
 
         @Override
         public Node<E> next() {
+            Node<E> res = current;
             current = current.getNext();
-            return current;
+            return res;
         }
     }
 

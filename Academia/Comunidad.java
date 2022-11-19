@@ -2,18 +2,20 @@ package TPE_LinkedList.Academia;
 
 import TPE_LinkedList.CustomLinkedList;
 import TPE_LinkedList.Node;
-
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
 public class Comunidad extends Universitaria {
     CustomLinkedList<Universitaria> listaUniversitaria;
     private String nombre;
-    private String categoria;
 
     public Comunidad(Comparator<Universitaria> comparadorUniversitario) {
-        this.listaUniversitaria = new CustomLinkedList<Universitaria>(comparadorUniversitario);
+        this.listaUniversitaria = new CustomLinkedList<>(comparadorUniversitario);
+    }
+
+    public Comunidad(Comparator<Universitaria> comparadorUniversitario, String nombre) {
+        this(comparadorUniversitario);
+        this.nombre = nombre;
     }
 
     public void addListaUniversitaria(List<Universitaria> listaFactultades) {
@@ -24,6 +26,11 @@ public class Comunidad extends Universitaria {
 
     public void addUniversitaria(Universitaria universitaria) {
         listaUniversitaria.addElement(universitaria);
+    }
+
+    @Override
+    public String getNombre() {
+        return nombre;
     }
 
     @Override
